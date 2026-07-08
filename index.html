@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Nikitha &amp; Purna · Wedding Invitation</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Tangerine:wght@400;700&family=Marcellus&display=swap" rel="stylesheet">
+
+<!-- Pre-warm YouTube connections and start loading the player API immediately -->
+<link rel="preconnect" href="https://www.youtube.com">
+<link rel="preconnect" href="https://i.ytimg.com">
+<link rel="preconnect" href="https://www.google.com">
+<script>
+  window.__ytQueue = [];
+  window.__ytApiLoaded = false;
+  window.onYouTubeIframeAPIReady = function(){
+    window.__ytApiLoaded = true;
+    window.__ytQueue.forEach(function(f){ try{ f(); }catch(e){} });
+    window.__ytQueue = [];
+  };
+  (function(){
+    var s = document.createElement('script');
+    s.src = 'https://www.youtube.com/iframe_api';
+    s.async = true;
+    s.onerror = function(){ window.__ytApiFailed = true; };
+    document.head.appendChild(s);
+  })();
+</script>
 <style>
   :root{
     --gold: #c9a961;
@@ -700,14 +721,14 @@
       localAudio.pause();
     }
 
-    /* Load the official YouTube IFrame API; fall back to the local track if it fails */
+    /* Hook into the YouTube API that began loading in <head>; local fallback if it fails */
     (function(){
       function fallbackLocal(){
         if (usingYT) return;
         if (intentOn && !document.hidden) playMusic();  // starts muted until first gesture
       }
       var t = setTimeout(fallbackLocal, 4000);
-      window.onYouTubeIframeAPIReady = function(){
+      function initPlayer(){
         clearTimeout(t);
         ytPlayer = new YT.Player('yt-audio', {
           width: 1, height: 1,
@@ -725,11 +746,10 @@
             }
           }
         });
-      };
-      var tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      tag.onerror = function(){ clearTimeout(t); fallbackLocal(); };
-      document.head.appendChild(tag);
+      }
+      if (window.__ytApiFailed){ clearTimeout(t); fallbackLocal(); }
+      else if (window.__ytApiLoaded && window.YT && window.YT.Player){ initPlayer(); }
+      else if (window.__ytQueue){ window.__ytQueue.push(initPlayer); }
     })();
 
     /* First user gesture anywhere unlocks audible sound */
@@ -756,7 +776,15 @@
     /* Manual toggle - the single source of truth for the switch */
     mBtn.addEventListener('click', function(e){
       e.stopPropagation();
-      unlocked = true;
+      if (!unlocked){
+        // First-ever interaction with the button while sound is still locked:
+        // the user wants to HEAR the music, not switch it off.
+        unlocked = true;
+        intentOn = true;
+        playMusic();
+        setBtn();
+        return;
+      }
       intentOn = !intentOn;
       if (intentOn) playMusic(); else pauseMusic();
       setBtn();
