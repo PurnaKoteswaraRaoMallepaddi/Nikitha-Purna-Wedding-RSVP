@@ -474,6 +474,84 @@
     transform: rotate(-45deg);
     border-radius: 2px;
   }
+
+  /* ============== WELCOME OVERLAY ============== */
+  .enter-overlay{
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    background:
+      radial-gradient(circle at 50% 20%, rgba(201,169,97,0.13) 0%, transparent 55%),
+      radial-gradient(circle at 50% 100%, rgba(201,169,97,0.10) 0%, transparent 50%),
+      var(--ivory);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+  }
+  .enter-overlay.leaving{ opacity: 0; pointer-events: none; }
+  .enter-inner{
+    padding: 40px 28px;
+    max-width: 420px;
+  }
+  .enter-inner img{
+    width: 130px;
+    height: auto;
+    margin: 0 auto 22px;
+    display: block;
+  }
+  .enter-eyebrow{
+    font-family: 'Marcellus', serif;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--gold-dark);
+    margin-bottom: 14px;
+  }
+  .enter-names{
+    font-family: 'Tangerine', cursive;
+    font-weight: 700;
+    font-size: clamp(52px, 10vw, 74px);
+    color: var(--ink);
+    line-height: 1.05;
+    margin-bottom: 8px;
+  }
+  .enter-dates{
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 17px;
+    color: var(--ink-soft);
+    margin-bottom: 34px;
+  }
+  .enter-btn{
+    font-family: 'Marcellus', serif;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 13px;
+    color: white;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
+    border: 1px solid rgba(255,255,255,0.35);
+    padding: 14px 34px;
+    border-radius: 2px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(201,169,97,0.4);
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+  }
+  .enter-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(201,169,97,0.55);
+  }
+  .enter-hint{
+    margin-top: 16px;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--gold-dark);
+    opacity: 0.8;
+  }
   @media (max-width: 560px){
     .music-toggle{ width: 42px; height: 42px; bottom: 16px; right: 16px; font-size: 17px; }
   }
@@ -481,6 +559,19 @@
 </style>
 </head>
 <body>
+
+<!-- WELCOME OVERLAY: guest's tap to enter doubles as the audio-unlock gesture -->
+<div class="enter-overlay" id="enter-overlay">
+  <div class="enter-inner">
+    <div id="enter-logo"></div>
+    <div class="enter-eyebrow">The Wedding Of</div>
+    <div class="enter-names">Nikitha &amp; Purna</div>
+    <div class="enter-dates">August 25 — 29, 2026</div>
+    <button class="enter-btn" type="button">Open Invitation</button>
+    <div class="enter-hint">♪ with music</div>
+  </div>
+</div>
+
 
 <div class="card">
 
@@ -791,6 +882,28 @@
     });
 
     setBtn();  // renders ON by default
+
+    /* ---- Welcome overlay: entering unlocks the music ---- */
+    var overlay = document.getElementById('enter-overlay');
+    (function(){
+      // reuse the header monogram in the overlay without duplicating the image data
+      var logo = document.querySelector('img.logo');
+      if (logo){
+        var clone = logo.cloneNode(true);
+        clone.className = '';
+        document.getElementById('enter-logo').appendChild(clone);
+      }
+      document.body.style.overflow = 'hidden';   // hold the page until they enter
+      function enter(){
+        unlocked = true;
+        if (intentOn) playMusic();               // tap = allowed gesture, sound starts now
+        overlay.classList.add('leaving');
+        document.body.style.overflow = '';
+        setTimeout(function(){ overlay.remove(); }, 900);
+        overlay.removeEventListener('click', enter);
+      }
+      overlay.addEventListener('click', enter);
+    })();
   })();
 </script>
 
