@@ -783,8 +783,12 @@
 
     /* ---- Background music: YouTube (Kalyanam Vybhogam) with local fallback ---- */
     var YT_ID = 'DYcBV9OoAag';
+    var START_AT = 5;                    // skip the first 0:05 of the video (adjust here if needed)
     var intentOn = true;                 // default: music switch is ON
     var unlocked = false;                // becomes true after first user gesture
+    var entered = false;                 // true once the guest taps "Open Invitation" - nothing plays before this
+    var startedOnce = false;             // ensures the 0:05 skip happens only on the first start
+    var ytPending = true;                // true while we are still waiting for YouTube to be ready
     var mBtn = document.getElementById('music-toggle');
     var localAudio = document.getElementById('bg-music');
     localAudio.volume = 0.55;
@@ -798,14 +802,21 @@
     }
 
     function playMusic(){
+      if (!entered) return;                          // absolutely nothing plays before "Open Invitation"
       if (usingYT && ytReady){
+        if (!startedOnce){
+          ytPlayer.seekTo(START_AT, true);           // begin at 0:05, skipping the intro
+          startedOnce = true;
+        }
         if (unlocked) ytPlayer.unMute();
         ytPlayer.playVideo();
-      } else {
+      } else if (!ytPending){
+        // YouTube definitively failed - fall back to the local instrumental
         localAudio.muted = !unlocked;
         var p = localAudio.play();
         if (p) p.catch(function(){ /* will retry on next gesture */ });
       }
+      // while ytPending: stay silent for a moment rather than playing the wrong track
     }
     function pauseMusic(){
       if (usingYT && ytReady && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
@@ -815,8 +826,9 @@
     /* Hook into the YouTube API that began loading in <head>; local fallback if it fails */
     (function(){
       function fallbackLocal(){
+        ytPending = false;
         if (usingYT) return;
-        if (intentOn && !document.hidden) playMusic();  // starts muted until first gesture
+        if (entered && intentOn && !document.hidden) playMusic();
       }
       var t = setTimeout(fallbackLocal, 4000);
       function initPlayer(){
@@ -824,12 +836,12 @@
         ytPlayer = new YT.Player('yt-audio', {
           width: 1, height: 1,
           videoId: YT_ID,
-          playerVars: { autoplay: 1, mute: 1, controls: 0, loop: 1, playlist: YT_ID, playsinline: 1, rel: 0 },
+          playerVars: { autoplay: 0, mute: 1, controls: 0, loop: 1, playlist: YT_ID, playsinline: 1, rel: 0 },
           events: {
             onReady: function(){
-              usingYT = true; ytReady = true;
+              usingYT = true; ytReady = true; ytPending = false;
               localAudio.pause();
-              if (intentOn && !document.hidden) playMusic();
+              if (entered && intentOn && !document.hidden) playMusic();
             },
             onError: function(){
               usingYT = false; ytReady = false;
@@ -896,7 +908,8 @@
       document.body.style.overflow = 'hidden';   // hold the page until they enter
       function enter(){
         unlocked = true;
-        if (intentOn) playMusic();               // tap = allowed gesture, sound starts now
+        entered = true;
+        if (intentOn) playMusic();               // starts fresh from 0:05, only now
         overlay.classList.add('leaving');
         document.body.style.overflow = '';
         setTimeout(function(){ overlay.remove(); }, 900);
