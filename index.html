@@ -838,10 +838,19 @@
           videoId: YT_ID,
           playerVars: { autoplay: 0, mute: 1, controls: 0, loop: 1, playlist: YT_ID, playsinline: 1, rel: 0 },
           events: {
-            onReady: function(){
+            onReady: function(event){
               usingYT = true; ytReady = true; ytPending = false;
               localAudio.pause();
+              event.target.mute();
+              event.target.pauseVideo();           // belt-and-braces: ensure fully stopped until entry
               if (entered && intentOn && !document.hidden) playMusic();
+            },
+            onStateChange: function(event){
+              // hard guarantee: if playback ever starts before the guest has entered, kill it
+              if (!entered && event.data === YT.PlayerState.PLAYING){
+                event.target.pauseVideo();
+                event.target.mute();
+              }
             },
             onError: function(){
               usingYT = false; ytReady = false;
