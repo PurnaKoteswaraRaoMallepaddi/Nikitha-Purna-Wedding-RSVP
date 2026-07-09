@@ -301,90 +301,29 @@
     color: var(--gold);
     font-size: 11px;
   }
-  /* ============== SLIDESHOW ============== */
-  .slideshow{
-    position: relative;
-    max-width: 560px;
+  /* ============== INVITATION MESSAGE ============== */
+  .invite-message{
+    max-width: 520px;
     margin: 0 auto;
-    background: white;
-    border: 1px solid var(--gold-light);
-    padding: 10px;
-    border-radius: 3px;
-    box-shadow: 0 6px 24px rgba(58,47,32,0.10);
   }
-  .slides{
-    position: relative;
-    height: 560px;
-    background: var(--ivory-deep);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .slide{
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.9s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .slide.active{ opacity: 1; }
-  .slide img{
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    display: block;
-  }
-  .slide-arrow{
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(253,250,242,0.88);
-    border: 1px solid var(--gold);
-    color: var(--gold-dark);
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    font-size: 17px;
-    line-height: 1;
-    cursor: pointer;
-    z-index: 2;
-    transition: background 0.2s ease, color 0.2s ease;
-  }
-  .slide-arrow:hover{ background: var(--gold); color: white; }
-  .slide-prev{ left: 18px; }
-  .slide-next{ right: 18px; }
-  .slide-dots{
-    display: flex;
-    justify-content: center;
-    gap: 9px;
-    padding: 14px 0 4px;
-  }
-  .slide-dot{
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    background: var(--gold-light);
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: background 0.25s ease, transform 0.25s ease;
-  }
-  .slide-dot.active{
-    background: var(--gold-dark);
-    transform: scale(1.35);
+  .invite-message p{
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 19px;
+    line-height: 1.8;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
   }
   .gallery-note{
     margin-top: 26px;
     font-family: 'Cormorant Garamond', serif;
     font-style: italic;
-    font-size: 16px;
-    color: var(--ink-soft);
+    font-size: 17px;
+    color: var(--gold-dark);
+    line-height: 1.7;
   }
   @media (max-width: 560px){
-    .gallery{ padding: 36px 18px 40px; }
-    .slides{ height: 62vw; min-height: 300px; }
-    .slide-arrow{ width: 32px; height: 32px; font-size: 15px; }
-    .slide-prev{ left: 10px; }
-    .slide-next{ right: 10px; }
+    .gallery{ padding: 36px 22px 40px; }
+    .invite-message p{ font-size: 17px; }
   }
 
   /* ============== LIGHTBOX ============== */
@@ -566,7 +505,7 @@
     <div id="enter-logo"></div>
     <div class="enter-eyebrow">The Wedding Of</div>
     <div class="enter-names">Nikitha &amp; Purna</div>
-    <div class="enter-dates">August 25 — 29, 2026</div>
+    <div class="enter-dates">Thursday, August 27, 2026</div>
     <button class="enter-btn" type="button">Open Invitation</button>
     <div class="enter-hint">♪ with music</div>
   </div>
@@ -590,7 +529,7 @@
 
   <!-- HERO PHOTO -->
   <div class="hero-photo">
-    <img src="photos/golden-gate-walk.jpg" alt="Nikitha and Purna walking along Baker Beach with the Golden Gate Bridge behind them" />
+    <img src="photos/trail-portrait.jpg" alt="Nikitha and Purna smiling together on a golden levee trail" />
   </div>
 
   <!-- EVENTS -->
@@ -670,30 +609,19 @@
 
   </div>
 
-  <!-- GALLERY -->
+  <!-- INVITATION MESSAGE -->
   <div class="gallery">
-    <div class="gallery-label">A Few Moments</div>
-    <div class="gallery-title">Our Story</div>
+    <div class="gallery-label">With Love</div>
+    <div class="gallery-title">Dear Family &amp; Friends</div>
     <div class="gallery-divider"></div>
 
-    <div class="slideshow" aria-label="Photo slideshow">
-      <div class="slides">
-        <div class="slide active"><img src="photos/trail-gaze.jpg" alt="Nikitha and Purna smiling at each other on a golden trail" /></div>
-        <div class="slide"><img src="photos/redwood-smiles.jpg" loading="lazy" alt="Nikitha and Purna smiling beneath a redwood tree" /></div>
-        <div class="slide"><img src="photos/golden-hour.jpg" loading="lazy" alt="A close golden-hour moment by the sea" /></div>
-        <div class="slide"><img src="photos/beach-run-bw.jpg" loading="lazy" alt="Running together along the shoreline" /></div>
-        <div class="slide"><img src="photos/trail-portrait.jpg" loading="lazy" alt="Portrait on the levee trail" /></div>
-        <div class="slide"><img src="photos/bridge-gaze.jpg" loading="lazy" alt="Gazing at each other by the Golden Gate at sunset" /></div>
-        <div class="slide"><img src="photos/beach-chase-bw.jpg" loading="lazy" alt="A playful chase along the water" /></div>
-        <div class="slide"><img src="photos/garden-smiles.jpg" loading="lazy" alt="Smiling together in a garden of ivy" /></div>
-        <div class="slide"><img src="photos/looking-ahead.jpg" loading="lazy" alt="Hand in hand, looking out toward the hills" /></div>
-        <button class="slide-arrow slide-prev" aria-label="Previous photo">‹</button>
-        <button class="slide-arrow slide-next" aria-label="Next photo">›</button>
-      </div>
-      <div class="slide-dots"></div>
+    <div class="invite-message">
+      <p>With hearts full of joy and the blessings of our parents, we invite you to celebrate the beginning of our forever.</p>
+      <p>Some moments in life are made complete only by the people we love — and our wedding is one of them. It would mean the world to us to have you by our side as we take our seven steps together, surrounded by laughter, music, and the warmth of family.</p>
+      <p>Join us for the celebrations, shower us with your blessings, and dance with us a little too.</p>
     </div>
 
-    <div class="gallery-note">…and the best is yet to come.</div>
+    <div class="gallery-note">With love and gratitude,<br/>Nikitha &amp; Purna</div>
   </div>
 
   <!-- RSVP -->
@@ -725,39 +653,7 @@
 
 <script>
   (function(){
-    /* ---- Slideshow ---- */
-    var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
-    var dotsWrap = document.querySelector('.slide-dots');
-    var current = 0, timer = null, INTERVAL = 4500;
-
-    slides.forEach(function(_, i){
-      var d = document.createElement('button');
-      d.className = 'slide-dot' + (i === 0 ? ' active' : '');
-      d.setAttribute('aria-label', 'Go to photo ' + (i+1));
-      d.addEventListener('click', function(){ go(i); restart(); });
-      dotsWrap.appendChild(d);
-    });
-    var dots = Array.prototype.slice.call(dotsWrap.children);
-
-    function go(i){
-      slides[current].classList.remove('active');
-      dots[current].classList.remove('active');
-      current = (i + slides.length) % slides.length;
-      slides[current].classList.add('active');
-      dots[current].classList.add('active');
-    }
-    function next(){ go(current + 1); }
-    function restart(){ clearInterval(timer); timer = setInterval(next, INTERVAL); }
-
-    document.querySelector('.slide-prev').addEventListener('click', function(e){ e.stopPropagation(); go(current - 1); restart(); });
-    document.querySelector('.slide-next').addEventListener('click', function(e){ e.stopPropagation(); next(); restart(); });
-
-    var show = document.querySelector('.slideshow');
-    show.addEventListener('mouseenter', function(){ clearInterval(timer); });
-    show.addEventListener('mouseleave', restart);
-    restart();
-
-    /* ---- Lightbox (hero + slideshow) ---- */
+    /* ---- Lightbox (hero photo) ---- */
     var lb = document.getElementById('lightbox');
     var lbImg = lb.querySelector('img');
     function openLB(img){
@@ -768,10 +664,6 @@
     }
     document.querySelector('.hero-photo').addEventListener('click', function(){
       openLB(document.querySelector('.hero-photo img'));
-    });
-    document.querySelector('.slides').addEventListener('click', function(e){
-      if (e.target.closest('.slide-arrow')) return;
-      openLB(slides[current].querySelector('img'));
     });
     function close(){
       lb.classList.remove('open');
