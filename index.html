@@ -5,27 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Nikitha &amp; Purna · Wedding Invitation</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Tangerine:wght@400;700&family=Marcellus&display=swap" rel="stylesheet">
-
-<!-- Pre-warm YouTube connections and start loading the player API immediately -->
-<link rel="preconnect" href="https://www.youtube.com">
-<link rel="preconnect" href="https://i.ytimg.com">
-<link rel="preconnect" href="https://www.google.com">
-<script>
-  window.__ytQueue = [];
-  window.__ytApiLoaded = false;
-  window.onYouTubeIframeAPIReady = function(){
-    window.__ytApiLoaded = true;
-    window.__ytQueue.forEach(function(f){ try{ f(); }catch(e){} });
-    window.__ytQueue = [];
-  };
-  (function(){
-    var s = document.createElement('script');
-    s.src = 'https://www.youtube.com/iframe_api';
-    s.async = true;
-    s.onerror = function(){ window.__ytApiFailed = true; };
-    document.head.appendChild(s);
-  })();
-</script>
 <style>
   :root{
     --gold: #c9a961;
@@ -644,9 +623,8 @@
   <img alt="" />
 </div>
 
-<!-- BACKGROUND MUSIC: Kalyanam Vybhogam via YouTube, local instrumental as fallback -->
-<div id="yt-audio" style="position:fixed; bottom:0; right:0; width:1px; height:1px; opacity:0.01; pointer-events:none; overflow:hidden;"></div>
-<audio id="bg-music" src="music/wedding-theme.mp3" loop preload="auto"></audio>
+<!-- BACKGROUND MUSIC: Kalyanam Vybhogam (purchased track, served locally - no ads) -->
+<audio id="bg-music" src="music/kalyanam-vybhogam.mp3" loop preload="auto"></audio>
 <button class="music-toggle" id="music-toggle" aria-label="Toggle music">
   <span aria-hidden="true">♪</span>
 </button>
@@ -673,19 +651,12 @@
     lb.addEventListener('click', close);
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
 
-    /* ---- Background music: YouTube (Kalyanam Vybhogam) with local fallback ---- */
-    var YT_ID = 'DYcBV9OoAag';
-    var START_AT = 5;                    // skip the first 0:05 of the video (adjust here if needed)
+    /* ---- Background music: Kalyanam Vybhogam (local file - instant, ad-free) ---- */
     var intentOn = true;                 // default: music switch is ON
-    var unlocked = false;                // becomes true after first user gesture
-    var entered = false;                 // true once the guest taps "Open Invitation" - nothing plays before this
-    var startedOnce = false;             // ensures the 0:05 skip happens only on the first start
-    var ytPending = true;                // true while we are still waiting for YouTube to be ready
+    var entered = false;                 // nothing plays before "Open Invitation"
     var mBtn = document.getElementById('music-toggle');
-    var localAudio = document.getElementById('bg-music');
-    localAudio.volume = 0.55;
-
-    var ytPlayer = null, ytReady = false, usingYT = false;
+    var music = document.getElementById('bg-music');
+    music.volume = 0.55;
 
     function setBtn(){
       mBtn.classList.toggle('playing', intentOn);
@@ -694,101 +665,21 @@
     }
 
     function playMusic(){
-      if (!entered) return;                          // absolutely nothing plays before "Open Invitation"
-      if (usingYT && ytReady){
-        if (!startedOnce){
-          ytPlayer.seekTo(START_AT, true);           // begin at 0:05, skipping the intro
-          startedOnce = true;
-        }
-        if (unlocked) ytPlayer.unMute();
-        ytPlayer.playVideo();
-      } else if (!ytPending){
-        // YouTube definitively failed - fall back to the local instrumental
-        localAudio.muted = !unlocked;
-        var p = localAudio.play();
-        if (p) p.catch(function(){ /* will retry on next gesture */ });
-      }
-      // while ytPending: stay silent for a moment rather than playing the wrong track
+      if (!entered) return;
+      var p = music.play();
+      if (p) p.catch(function(){ /* retried on next gesture */ });
     }
-    function pauseMusic(){
-      if (usingYT && ytReady && ytPlayer.pauseVideo) ytPlayer.pauseVideo();
-      localAudio.pause();
-    }
-
-    /* Hook into the YouTube API that began loading in <head>; local fallback if it fails */
-    (function(){
-      function fallbackLocal(){
-        ytPending = false;
-        if (usingYT) return;
-        if (entered && intentOn && !document.hidden) playMusic();
-      }
-      var t = setTimeout(fallbackLocal, 4000);
-      function initPlayer(){
-        clearTimeout(t);
-        ytPlayer = new YT.Player('yt-audio', {
-          width: 1, height: 1,
-          videoId: YT_ID,
-          playerVars: { autoplay: 0, mute: 1, controls: 0, loop: 1, playlist: YT_ID, playsinline: 1, rel: 0 },
-          events: {
-            onReady: function(event){
-              usingYT = true; ytReady = true; ytPending = false;
-              localAudio.pause();
-              event.target.mute();
-              event.target.pauseVideo();           // belt-and-braces: ensure fully stopped until entry
-              if (entered && intentOn && !document.hidden) playMusic();
-            },
-            onStateChange: function(event){
-              // hard guarantee: if playback ever starts before the guest has entered, kill it
-              if (!entered && event.data === YT.PlayerState.PLAYING){
-                event.target.pauseVideo();
-                event.target.mute();
-              }
-            },
-            onError: function(){
-              usingYT = false; ytReady = false;
-              fallbackLocal();
-            }
-          }
-        });
-      }
-      if (window.__ytApiFailed){ clearTimeout(t); fallbackLocal(); }
-      else if (window.__ytApiLoaded && window.YT && window.YT.Player){ initPlayer(); }
-      else if (window.__ytQueue){ window.__ytQueue.push(initPlayer); }
-    })();
-
-    /* First user gesture anywhere unlocks audible sound */
-    function firstInteraction(e){
-      if (e && e.target && e.target.closest && e.target.closest('#music-toggle')) return;
-      unlocked = true;
-      if (intentOn && !document.hidden) playMusic();
-      document.removeEventListener('pointerdown', firstInteraction);
-      document.removeEventListener('keydown', firstInteraction);
-      document.removeEventListener('touchstart', firstInteraction);
-      document.removeEventListener('click', firstInteraction);
-    }
-    document.addEventListener('pointerdown', firstInteraction);
-    document.addEventListener('keydown', firstInteraction);
-    document.addEventListener('touchstart', firstInteraction);
-    document.addEventListener('click', firstInteraction);
+    function pauseMusic(){ music.pause(); }
 
     /* Pause whenever the tab/app is hidden; resume when it returns */
     document.addEventListener('visibilitychange', function(){
       if (document.hidden) pauseMusic();
-      else if (intentOn) playMusic();
+      else if (entered && intentOn) playMusic();
     });
 
-    /* Manual toggle - the single source of truth for the switch */
+    /* Manual toggle */
     mBtn.addEventListener('click', function(e){
       e.stopPropagation();
-      if (!unlocked){
-        // First-ever interaction with the button while sound is still locked:
-        // the user wants to HEAR the music, not switch it off.
-        unlocked = true;
-        intentOn = true;
-        playMusic();
-        setBtn();
-        return;
-      }
       intentOn = !intentOn;
       if (intentOn) playMusic(); else pauseMusic();
       setBtn();
@@ -808,9 +699,8 @@
       }
       document.body.style.overflow = 'hidden';   // hold the page until they enter
       function enter(){
-        unlocked = true;
         entered = true;
-        if (intentOn) playMusic();               // starts fresh from 0:05, only now
+        if (intentOn) playMusic();               // the entry tap is the gesture; song starts now
         overlay.classList.add('leaving');
         document.body.style.overflow = '';
         setTimeout(function(){ overlay.remove(); }, 900);
